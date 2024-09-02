@@ -1,0 +1,4 @@
+<?php
+?>
+
+<p>Earnings</p>
