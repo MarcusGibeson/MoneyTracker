@@ -11,11 +11,9 @@ function is_account_exists($pdo, $user_id, $account_name) {
     return $stmt->fetchColumn();
 }
 
-function is_input_empty(...$inputs) {
-    foreach($inputs as $input) {
-        if(empty(trim($input))) {
-            return true;
-        }
-    }
-    return false;
+function get_user_accounts($pdo, $user_id) {
+    $stmt = $pdo->prepare("SELECT account_name, account_type, balance FROM accounts WHERE user_id = :user_id");
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
