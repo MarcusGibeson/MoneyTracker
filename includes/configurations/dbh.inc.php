@@ -5,6 +5,7 @@ $dbname = 'budget_tracker';
 $dbusername = 'root';
 $dbpassword = '';
 
+
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $dbusername, $dbpassword);
 

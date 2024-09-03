@@ -2,9 +2,13 @@
 session_start();
 require_once 'includes/configurations/dbh.inc.php';
 require_once 'includes/models/account_model.inc.php';
+require_once 'includes/controllers/account_contr.inc.php';
 
 $user_id = $_SESSION['user_id'];
-$accounts = get_user_accounts($pdo, $user_id);
+$accountController = new AccountController($pdo);
+
+$accounts = $accountController->get_user_accounts($user_id);
+$total_balance = $accountController->showAccountTotal($user_id);
 ?>
 
 <p>Account Overview</p>
@@ -22,7 +26,7 @@ $accounts = get_user_accounts($pdo, $user_id);
                 <tr>
                     <td><?php echo htmlspecialchars($account['account_name']); ?></td>
                     <td><?php echo htmlspecialchars($account['account_type']); ?></td>
-                    <td><?php echo htmlspecialchars($account['balance'], 2); ?></td>
+                    <td><?php echo number_format($account['balance'], 2); ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

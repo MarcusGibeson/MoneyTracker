@@ -7,3 +7,5 @@ function account_inputs() {
     echo '<input type="text" name="account_name" placeholder="Account Name" value = "' . $account_name_value . '">';
     echo '<input type="text" name="account_type" placeholder="Account Type" value = "' . $account_type_value . '">';
 }
+
+echo 'Account total: $' . number_format($account_total, 2);
