@@ -19,12 +19,17 @@ function loadContent(fragmentName) {
                     break;
                 case 'account-overview':
                     initializeModal('add-account'); //For create account modals
+                    createClickableRows();
                     break;
                 case 'earnings':
                     initializeModal('add-earning'); //For create earning modals
                     break;
                 case 'expenses':
                     initializeModal('add-expense'); //For create expense modals
+                    break;
+                case 'wage-calculator':
+                    initializeModal('wage-calculator');
+                    addDay();
                     break;
             }
         })
@@ -101,4 +106,58 @@ function loadModalContent(modalType) {
         .catch(function(error) {
             console.log(`Error loading ${modalType} content:`, error);
         });
+}
+
+function createClickableRows() {
+    document.querySelectorAll('.account-row span').forEach(function(span) {
+        span.addEventListener('click', function() {
+            // Remove any existing details rows
+            document.querySelectorAll('.account-details').forEach(function(detailsRow) {
+                detailsRow.remove();
+            });
+
+            // Get the clicked row
+            var row = this.closest('.account-row');
+            var accountId = row.getAttribute('data-account-id');
+
+            // Create a new row for details
+            var detailsRow = document.createElement('tr');
+            detailsRow.classList.add('account-details');
+
+            // Create a new cell to span across all columns
+            var detailsCell = document.createElement('td');
+            detailsCell.setAttribute('colspan', '3');
+            detailsCell.textContent = 'Loading details...'; // Placeholder text
+
+            // Append the cell to the details row
+            detailsRow.appendChild(detailsCell);
+
+            // Insert the details row after the clicked row
+            row.insertAdjacentElement('afterend', detailsRow);
+
+            // Fetch the actual details via AJAX
+            fetch(`get_account_details.php?account_id=${accountId}`)
+                .then(response => response.text())
+                .then(data => {
+                    detailsCell.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error fetching account details:', error);
+                    detailsCell.textContent = 'Failed to load details.';
+                });
+        });
+    });
+}
+
+function addDay() {
+            // Clone the first day input set
+            const form = document.getElementById('wage-calculator-form');
+            const dayInputs = document.querySelector('.day-inputs');
+            const newDay = dayInputs.cloneNode(true);
+
+            // Clear the input values
+            newDay.querySelectorAll('input').forEach(input => input.value = '');
+
+            // Append the new day input set
+            form.insertBefore(newDay, document.getElementById('add-day-button'));
 }

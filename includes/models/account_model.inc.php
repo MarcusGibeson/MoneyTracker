@@ -18,11 +18,25 @@ class AccountModel{
     }
 
     function get_user_accounts($user_id) {
-        $stmt = $this->pdo->prepare("SELECT account_name, account_type, (SELECT SUM(amount) FROM earnings WHERE account_id = accounts.id) - (SELECT SUM(amount) FROM expenses WHERE account_id = accounts.id) AS balance FROM accounts WHERE user_id = :user_id");
+        $stmt = $this->pdo->prepare("
+        SELECT 
+            id,
+            account_name, 
+            account_type, 
+            COALESCE(
+                (SELECT SUM(amount) FROM earnings WHERE account_id = accounts.id), 0
+            ) - COALESCE(
+                (SELECT SUM(amount) FROM expenses WHERE account_id = accounts.id), 0
+            ) AS balance 
+        FROM accounts 
+        WHERE user_id = :user_id
+        ");
         $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    
 
     public function get_total_earnings($user_id) {
         $query = "SELECT SUM(amount) AS total_earnings FROM earnings WHERE user_id = ?";
@@ -45,7 +59,20 @@ class AccountModel{
     public function get_total_balance($user_id) {
         $total_earnings = $this->get_total_earnings($user_id);
         $total_expenses = $this->get_total_expenses($user_id);
-        return $total_earnings - $total_expenses;
+        $total_balance = $total_earnings - $total_expenses;
+        return $total_balance;
+    }
+
+    public function getEarningsByAccountId($account_id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM earnings WHERE account_id = ? ORDER BY gain_date DESC");
+        $stmt->execute([$account_id]);
+        return $stmt->FetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getExpensesByAccountId($account_id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM expenses WHERE account_id = ? ORDER BY expense_date DESC");
+        $stmt->execute([$account_id]);
+        return $stmt->FetchAll(PDO::FETCH_ASSOC);
     }
 }
 

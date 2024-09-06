@@ -50,4 +50,20 @@ class AccountController {
     public function get_user_accounts($user_id) {
         return $this->accountModel->get_user_accounts($user_id);
     }
+
+    public function get_total_earnings($user_id) {
+        return $this->accountModel->get_total_earnings($user_id);
+    }
+
+    public function get_total_expenses($user_id) {
+        return $this->accountModel->get_total_expenses($user_id);
+    }
+
+    public function getEarnings($account_id) {
+        return $this->accountModel->getEarningsByAccountId($account_id);
+    }
+
+    public function getExpenses($account_id) {
+        return $this->accountModel->getExpensesByAccountId($account_id);
+    }
 }

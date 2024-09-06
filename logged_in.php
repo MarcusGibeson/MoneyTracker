@@ -9,6 +9,9 @@
         </div> 
         <div>
             <a href="#" data-fragment="earnings" id="earnings-link">Earnings</a>
+        </div>
+        <div>
+            <a href="#" data-fragment="wage-calculator" id="wage-calculator-link">Wage Calculator</a>
         </div> 
         <div>
             <form action="includes/logout.inc.php"><button class="text">Log out</button></form>

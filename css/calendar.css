@@ -1,0 +1,38 @@
+.calendar {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.calendar th, .calendar td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    width: 14.28%; /* 100% / 7 days */
+}
+
+.calendar th {
+    background-color: #f2f2f2;
+}
+
+.worked-day {
+    background-color: #ffdddd;
+    border: 2px solid red;
+    cursor: pointer;
+    position: relative;
+}
+
+.worked-day:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 3px;
+    white-space: nowrap;
+    font-size: 12px;
+    z-index: 10;
+}
