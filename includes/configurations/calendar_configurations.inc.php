@@ -1,7 +1,7 @@
 <?php
 
-require_once 'configurations/dbh.inc.php';
-require_once 'controllers/work_schedule_contr.inc.php';
+require_once 'dbh.inc.php';
+require_once __DIR__ . '/../controllers/work_schedule_contr.inc.php';
 
 session_start();
 

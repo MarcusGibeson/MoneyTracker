@@ -1,46 +1,41 @@
 <?php
 session_start();
 require_once 'configurations/dbh.inc.php';
+require_once 'models/work_schedule_model.inc.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'];
-    $work_dates = $_POST['work_date'];
-    $start_times = $_POST['start_time'];
-    $end_times = $_POST['end_time'];
-    $break_minutes = $_POST['break_minutes'];
-    $hourly_rate = $_POST['hourly_rate'];
-    $overtime_rate = $_POST['overtime_rate'];
+    $data = json_decode(file_get_contents('php://input'), true);
+    $selected_dates = $data['dates'];
 
+    $work_schedule = new WorkSchedule($pdo);
     $total_wage = 0;
 
-    for ($i = 0; $i < count($work_dates); $i++) {
-        $start_time = strtotime($start_times[$i]);
-        $end_time = strtotime($end_times[$i]);
-        $break = $break_minutes[$i];
+    foreach($selected_dates as $date) {
+        //Fetch work data for each selected date
+        $work_data = $workSchedule->fetchWorkDataByDate($user_id, $date);
 
-        // Calculate total hours worked
-        $worked_seconds = ($end_time - $start_time) - ($break * 60);
-        $worked_hours = $worked_seconds / 3600;
+        foreach($work_data as $work_day) {
+            $start_time = strtotime($work_day['start_time']);
+            $end_time = strtotime($work_day['end_time']);
+            $break = $work_day['break_minutes'];
+            $hourly_rate = $work_day['hourly_rate'];
+            $overtime_rate = $work_day['overtime_rate'];
 
-        // Check for overtime
-        $regular_hours = min($worked_hours, 8);
-        $overtime_hours = max($worked_hours - 8, 0);
+            $worked_seconds = ($end_time - $start_time) - ($break * 60);
+            $worked_hours = $worked_seconds / 3600;
 
-        // Calculate wage
-        $wage = ($regular_hours * $hourly_rate) + ($overtime_hours * $overtime_rate);
+            $regular_hours = min($worked_hours, 8);
+            $overtime_hours = max($worked_hours - 8, 0);
 
-        // Add to total wage
-        $total_wage += $wage;
-
-        // Insert into database
-        $stmt = $pdo->prepare("INSERT INTO wage_calculator (user_id, work_date, start_time, end_time, break_minutes, hourly_rate, overtime_rate) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$user_id, $work_dates[$i], date('H:i:s', $start_time), date('H:i:s', $end_time), $break, $hourly_rate, $overtime_rate]);
+            $wage = ($regular_hours * $hourly_rate) + ($overtime_hours * $overtime_rate);
+            $total_wage = $wage;
+        }
     }
 
-    // Output the total wage
-    echo "Total Wage: $" . number_format($total_wage, 2);
+    echo json_encode(['totalWage' => number_format($total_wage, 2)]);
 
-    
+        
 
 $tax_rate = 0.15; // Example tax rate of 15%
 $taxes = $total_wage * $tax_rate;

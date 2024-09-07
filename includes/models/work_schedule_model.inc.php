@@ -50,4 +50,13 @@ class WorkSchedule{
             ':overtime_rate' => $overtime_rate
         ]);
     }
+
+    public function fetchWorkDataByDate($user_id, $work_date) {
+        $stmt = $this->pdo->prepare("
+            SELECT * FROM work_schedule
+            WHERE user_id = :user_id AND work_date = :work_date
+        ");
+        $stmt->execute([':user_id' => $user_id, ':work_date' => $work_date]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

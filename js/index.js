@@ -27,8 +27,8 @@ function loadContent(fragmentName) {
                 case 'expenses':
                     initializeModal('add-expense'); //For create expense modals
                     break;
-                case 'wage-calculator':
-                    initializeModal('wage-calculator');
+                case 'work-calendar':
+                    initializeModal('add-workday');
                     addDay();
                     break;
             }
@@ -39,7 +39,7 @@ function loadContent(fragmentName) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    loadContent('account-overview');
+    loadContent('work-calendar');
 
     //handle navigation clicks
     document.querySelectorAll('.navigation-bar a').forEach(function(link) {
@@ -151,7 +151,7 @@ function createClickableRows() {
 
 function addDay() {
             // Clone the first day input set
-            const form = document.getElementById('wage-calculator-form');
+            const form = document.getElementById('add-workday-form');
             const dayInputs = document.querySelector('.day-inputs');
             const newDay = dayInputs.cloneNode(true);
 

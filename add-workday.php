@@ -1,10 +1,6 @@
-<?php
-require_once 'work-calendar.php';
-?>
 
-
-<h2>Wage Calculator</h2>
-    <form id="wage-calculator-form" method="post" action="includes/calculate_wage.inc.php">
+<h2>Work Calendar</h2>
+    <form id="add-workday-form" method="post" action="includes/add_workday.inc.php">
         <div class="day-inputs">
             <label for="date">Date:</label>
             <input type="date" name="work_date[]" required>
@@ -30,5 +26,5 @@ require_once 'work-calendar.php';
         </div>
 
         <button type="button" id="add-day-button" onclick="addDay()">Add Another Day</button>
-        <button type="submit">Calculate Wage</button>
+        <button type="submit">Add work day</button>
     </form>
