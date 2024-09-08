@@ -18,3 +18,5 @@
         </div>
     </div>
 </section>
+
+<div id="error-message"></div>

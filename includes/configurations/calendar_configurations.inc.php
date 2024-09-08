@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     //Display the calender view
     $year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
-    $month = isset($_GET['month']) ? intval($_GET['month']) : date('Y');
+    $month = isset($_GET['month']) ? intval($_GET['month']) : date('n');
 
     $worked_days = $controller->getWorkedDays($user_id, $year, $month); 
 

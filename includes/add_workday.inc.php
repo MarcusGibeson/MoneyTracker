@@ -5,6 +5,7 @@ require_once 'models/work_schedule_model.inc.php';
 
 
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_id = $_SESSION['user_id'];
     $work_dates = $_POST['work_date'];
     $start_times = $_POST['start_time'];
     $end_times = $_POST['end_time'];

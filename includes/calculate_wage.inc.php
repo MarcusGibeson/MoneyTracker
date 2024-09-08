@@ -8,7 +8,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
     $selected_dates = $data['dates'];
 
-    $work_schedule = new WorkSchedule($pdo);
+    $workSchedule = new WorkSchedule($pdo);
     $total_wage = 0;
 
     foreach($selected_dates as $date) {
@@ -29,19 +29,19 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             $overtime_hours = max($worked_hours - 8, 0);
 
             $wage = ($regular_hours * $hourly_rate) + ($overtime_hours * $overtime_rate);
-            $total_wage = $wage;
+            $total_wage += $wage;
         }
     }
 
-    echo json_encode(['totalWage' => number_format($total_wage, 2)]);
+    //Calculate taxes and net wage
+    $tax_rate = 0.15;
+    $taxes = $total_wage * $tax_rate;
+    $net_wage = $total_wage - $taxes;
 
-        
-
-$tax_rate = 0.15; // Example tax rate of 15%
-$taxes = $total_wage * $tax_rate;
-$net_wage = $total_wage - $taxes;
-
-echo "Total Wage: $" . number_format($total_wage, 2) . "<br>";
-echo "Taxes: $" . number_format($taxes, 2) . "<br>";
-echo "Net Wage: $" . number_format($net_wage, 2);
+    echo json_encode([
+        'totalWage' => number_format($total_wage, 2),
+        'taxes' => number_format($taxes, 2),
+        'netWage' => number_format($net_wage, 2)
+    ]);
+    exit;
 }

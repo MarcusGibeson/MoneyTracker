@@ -12,3 +12,7 @@
         </div>
     </div>
 </section>
+
+<section id="dynamic-content">
+    <p> Welcome to Budget tracker! Learn how to manage your fiances with our unique tools!</p>
+</section>

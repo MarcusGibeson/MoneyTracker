@@ -1,5 +1,8 @@
-function loadContent(fragmentName) {
+function loadContent(fragmentName, year = null, month = null) {
     var url = fragmentName + '.php';
+    if (year && month) {
+        url += `?year=${year}&month=${month}`;
+    }
 
     fetch(url) 
         .then(function(response) {
@@ -29,6 +32,7 @@ function loadContent(fragmentName) {
                     break;
                 case 'work-calendar':
                     initializeModal('add-workday');
+                    handleWorkCalendar();
                     addDay();
                     break;
             }
@@ -39,7 +43,10 @@ function loadContent(fragmentName) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    loadContent('work-calendar');
+    let defaultFragment = 'work-calendar';
+    let fragmentName = defaultFragment;
+    
+    loadContent(fragmentName);
 
     //handle navigation clicks
     document.querySelectorAll('.navigation-bar a').forEach(function(link) {
@@ -160,4 +167,71 @@ function addDay() {
 
             // Append the new day input set
             form.insertBefore(newDay, document.getElementById('add-day-button'));
+}
+
+function handleWorkCalendar() {
+    let selectedDates = [];
+
+
+    //Function to toggle day selection
+    function attachDayClickListeners(){
+        document.querySelectorAll('.calendar-day').forEach(day => {
+            day.addEventListener('click', function() {
+                const date = this.getAttribute('data-date');
+    
+                if(selectedDates.includes(date)) {
+                    selectedDates = selectedDates.filter(d => d != date); //Remove if already selected
+                    this.classList.remove('selected-day');
+                } else {
+                    selectedDates.push(date); //Add to selected dates
+                    this.classList.add('selected-day');
+                }
+            });
+        });
+    }
+
+    attachDayClickListeners();
+
+
+    //On button click, send selected dates to server for calculation
+    document.getElementById('calculate-wage-btn').addEventListener('click', function() {
+        console.log('Calculate wage button clicked');
+        fetch('/MoneyTracker/includes/calculate_wage.inc.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ dates: selectedDates})
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            if (data.totalWage != undefined) {
+                alert('Total Wage: ' + data.totalWage);
+            } else {
+                alert('Error calculating wage: ' + (data.error || 'Unknown error'));
+            }
+            
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const errorElement = document.getElementById('error-message');
+            errorElement.innerHTML = `<b>Error:</b> ${error.message}`; 
+
+        });
+    });
+
+    //Add event listeners to previous and next buttons
+    document.querySelectorAll('.calendar-navigation a').forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            const urlParams = new URLSearchParams(event.target.search);
+            const year = urlParams.get('year');
+            const month = urlParams.get('month');
+            loadContent('work-calendar', year, month);
+        });
+    });
 }

@@ -44,9 +44,9 @@ function generate_calendar($year, $month, $worked_days) {
 
         //Highlight worked days
         if (in_array($currentDate, $worked_days)) {
-            echo "<td class='worked-day'>$currentDay</td>";
+            echo "<td class='calendar-day worked-day' data-date='$currentDate'>$currentDay</td>";
         } else {
-            echo "<td>$currentDay</td>";
+            echo "<td class='calendar-day' data-date='$currentDate'>$currentDay</td>";
         }
 
         $currentDay++;
@@ -69,11 +69,12 @@ function generate_calendar($year, $month, $worked_days) {
 $year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
 $month = isset($_GET['month']) ? intval($_GET['month']) : date('n');
 
-//Generate the calendar
-generate_calendar($year, $month, $worked_days);
-
 //Add navigation to previous and next months
 echo "<div class='calendar-navigation'>";
 echo "<a href='?year=" . ($month == 1 ? $year - 1 : $year) . "&month=". ($month == 1 ? 12 : $month - 1) . "'>Previous</a> |";
 echo "<a href='?year=" . ($month == 12 ? $year + 1 : $year) . "&month=" . ($month == 12 ? 1 : $month + 1) . "'>Next</a>";
 echo "</div>";
+
+//Generate the calendar
+generate_calendar($year, $month, $worked_days);
+

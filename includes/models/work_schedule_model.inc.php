@@ -9,10 +9,15 @@ class WorkSchedule{
     }
 
     public function getWorkedDays($user_id, $year, $month) {
+
+        if($month <1 || $month > 12) {
+            throw new InvalidArgumentException("Invalid month value: $month");
+        }
+
         // Return an array of worked day dates (format: YYYY-MM-DD)
         $stmt = $this->pdo->prepare("SELECT work_date FROM work_schedule WHERE user_id = :user_id AND YEAR(work_date) = :year AND MONTH(work_date) = :month");
         $stmt->execute(['user_id' => $user_id, 'year' => $year, 'month' => $month]);
-    
+        
         return $stmt->fetchAll(PDO::FETCH_COLUMN); // Returns an array of dates
     }
 
