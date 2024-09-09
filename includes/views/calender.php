@@ -1,9 +1,23 @@
 <?php
 
+
 function generate_calendar($year, $month, $worked_days) {
     // Ensure $worked_days is an array
     if (!is_array($worked_days)) {
         $worked_days = [];
+    }
+
+    //Prepare a map of worked days with work time and hourly_rate
+    $worked_days_map = [];
+    foreach($worked_days as $work_data) {
+        if (!isset($work_data['work_date'])) {
+            throw new Exception("work_date missing from data");
+        }
+        $currentDate = $work_data['work_date'];
+        $worked_days_map[$currentDate] = [
+            'time' => $work_data['time_worked'],
+            'hourly_rate' => $work_data['hourly_rate']
+        ];
     }
 
     //Days of the week
@@ -42,9 +56,20 @@ function generate_calendar($year, $month, $worked_days) {
         //Format current date as YYYY-MM-DD
         $currentDate = sprintf("%04d-%02d-%02d", $year, $month, $currentDay);
 
-        //Highlight worked days
-        if (in_array($currentDate, $worked_days)) {
-            echo "<td class='calendar-day worked-day' data-date='$currentDate'>$currentDay</td>";
+        //Highlight worked days and show times
+        if (isset($worked_days_map[$currentDate])) {
+            $work_data = $worked_days_map[$currentDate];
+            $work_time = $work_data['time'];
+            $hourly_rate = $work_data['hourly_rate'];
+            echo "<td class='calendar-day worked-day' 
+                        data-date='$currentDate'
+                        data-time='$work_time'
+                        data-wage='$hourly_rate'
+                        onmouseover='showWorkInfo(event)'
+                        onmouseout='hideWorkInfo()'
+                    >";
+            echo "$currentDay";
+            echo "</td>";
         } else {
             echo "<td class='calendar-day' data-date='$currentDate'>$currentDay</td>";
         }

@@ -18,5 +18,7 @@ require_once 'includes/configurations/calendar_configurations.inc.php';
     </div>
 </div>
 
+<!-- On hover work-details modal -->
+ <div id="work-info-modal" class="modal-popup"></div>
 <style>
 </style>

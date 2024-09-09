@@ -42,3 +42,17 @@
     border: 2px solid green;
     background-color: green;
 }
+
+.modal-popup {
+    position: absolute;
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    display: none;
+    z-index: 1000;
+}
+
+.calendar-day {
+    position: relative;
+}

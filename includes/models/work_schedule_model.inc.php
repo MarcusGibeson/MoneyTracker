@@ -8,6 +8,7 @@ class WorkSchedule{
         $this->pdo=$pdo;
     }
 
+    
     public function getWorkedDays($user_id, $year, $month) {
 
         if($month <1 || $month > 12) {
@@ -15,10 +16,19 @@ class WorkSchedule{
         }
 
         // Return an array of worked day dates (format: YYYY-MM-DD)
-        $stmt = $this->pdo->prepare("SELECT work_date FROM work_schedule WHERE user_id = :user_id AND YEAR(work_date) = :year AND MONTH(work_date) = :month");
+        $stmt = $this->pdo->prepare("
+            SELECT work_date,
+                end_time,
+                start_time,
+                hourly_rate
+            FROM work_schedule 
+            WHERE user_id = :user_id 
+                AND YEAR(work_date) = :year 
+                AND MONTH(work_date) = :month
+        ");
         $stmt->execute(['user_id' => $user_id, 'year' => $year, 'month' => $month]);
         
-        return $stmt->fetchAll(PDO::FETCH_COLUMN); // Returns an array of dates
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Returns an array of dates
     }
 
     //Fetch work data for a specific user, year, and month

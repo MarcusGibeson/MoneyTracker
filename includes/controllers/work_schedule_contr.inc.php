@@ -14,11 +14,29 @@ class WorkScheduleController{
         return $worked_days;
     }
 
+    function calculateTimeWorked($worked_days) {
+        $results=[];
+        foreach($worked_days as $work_data) {
+            $start_time = new DateTime($work_data['start_time']);
+            $end_time = new DateTime($work_data['end_time']);
+            $interval = $start_time->diff($end_time);
+    
+            $time_worked = $interval->format('%H:%I:%S');
+    
+            $results[] = [
+                'work_date' => $work_data['work_date'],
+                'time_worked' => $time_worked,
+                'hourly_rate' => $work_data['hourly_rate']
+            ];       
+        }
+        return $results;
+    }
+
     //Display calender view with worked days highlighted
     public function showCalendar($user_id, $year, $month) {
         $work_data = $this->workScheduleModel->fetchWorkData($user_id, $year, $month);
-        $worked_days = array_column($work_data, 'work_date');
-
+        $worked_days = $work_data;
+        $worked_days = $this->calculateTimeWorked($worked_days);
         include __DIR__ . '/../views/calender.php';
     }
 

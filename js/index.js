@@ -235,3 +235,24 @@ function handleWorkCalendar() {
         });
     });
 }
+
+function showWorkInfo(event) {
+    const modal = document.getElementById('work-info-modal');
+    const cell = event.currentTarget;
+    const workTime = cell.getAttribute('data-time');
+    const wage = cell.getAttribute('data-wage');
+
+    //Set the modal content
+    modal.innerHTML = `Worked: ${workTime}<br>Wage: $${wage}`;
+
+    //Position the modal near the hovered cell
+    const rect = cell.getBoundingClientRect();
+    modal.style.left = `${rect.left + window.scrollX + 10}px`;
+    modal.style.top = `${rect.top + window.scrollY + 30}px`;
+    modal.style.display = 'block';
+}
+
+function hideWorkInfo() {
+    const modal = document.getElementById('work-info-modal');
+    modal.style.display = 'none';
+}
