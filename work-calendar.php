@@ -8,6 +8,8 @@ require_once 'includes/configurations/calendar_configurations.inc.php';
 
 <button id="calculate-wage-btn">Calculate Wage for Selected Days</button>
 
+<button id="display-details-btn">Show details for the selected days</button>
+
 <!-- Modal Structure -->
 <div id="add-workday-modal" class="modal">
     <div class="modal-content">
@@ -19,6 +21,10 @@ require_once 'includes/configurations/calendar_configurations.inc.php';
 </div>
 
 <!-- On hover work-details modal -->
- <div id="work-info-modal" class="modal-popup"></div>
-<style>
-</style>
+<div id="work-info-modal" class="modal-popup"></div>
+
+
+<div id="selected-day-details">
+
+    <!-- Selected days info will be shown here -->
+</div>

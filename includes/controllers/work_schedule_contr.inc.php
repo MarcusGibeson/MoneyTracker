@@ -106,4 +106,21 @@ class WorkScheduleController{
             echo "<p>Net Wage: $" . number_format($net_wage, 2) . "</p>";
         }
     }
+
+    //Fetch details for the selected days
+    public function getDetailsForSelectedDays($selectedDates) {
+        return $this->workScheduleModel->getDetailsForSelectedDays($selectedDates);
+    }
+
+    //Update work entry for specific day
+    public function updateWorkEntry($dayId, $updatedData) {
+        return $this->workScheduleModel->updateWorkEntry($dayId, $updatedData);
+    }
+
+    //Delete a specific work entry
+    public function deleteWorkEntry($dayId) {
+        error_log("Deleting work entry with ID: $dayId");
+        return $this->workScheduleModel->deleteWorkEntry($dayId);
+    }
+
 }

@@ -1,8 +1,5 @@
-function loadContent(fragmentName, year = null, month = null) {
+function loadContent(fragmentName) {
     var url = fragmentName + '.php';
-    if (year && month) {
-        url += `?year=${year}&month=${month}`;
-    }
 
     fetch(url) 
         .then(function(response) {
@@ -224,6 +221,12 @@ function handleWorkCalendar() {
         });
     });
 
+    //On button click, display the details for the selected dates
+    document.getElementById('display-details-btn').addEventListener('click', function() {
+        console.log(selectedDates);
+        fetchDayDetails(selectedDates);
+    });
+
     //Add event listeners to previous and next buttons
     document.querySelectorAll('.calendar-navigation a').forEach(function(link) {
         link.addEventListener('click', function(event) {
@@ -255,4 +258,182 @@ function showWorkInfo(event) {
 function hideWorkInfo() {
     const modal = document.getElementById('work-info-modal');
     modal.style.display = 'none';
+}
+
+function deleteWorkEntry(dayId, selectedDates) {
+    console.log('Deleting work entry with ID:', dayId);
+    if (confirm('Are you sure you want to delete this entry?')) {
+        fetch('/MoneyTracker/includes/handle_day_action.inc.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: 'delete',
+                dayId: dayId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Delete response:', data);
+            if (data.status === 'success') {
+                alert('Work entry deleted successfully.');
+                fetchDayDetails(selectedDates);
+            } else {
+                alert('Failed to delete work entry: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting entry:', error);
+        });
+    }
+}
+
+function fetchDayDetails(selectedDates) {
+    fetch('/MoneyTracker/includes/handle_day_action.inc.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            action: 'fetch-details',
+            selectedDates: selectedDates
+        })
+    })
+    .then(response => {
+        console.log('Response Status:', response.status);
+        return response.text();
+    })
+    .then(text => {
+        console.log('Response text:', text);
+        try {
+            const data = JSON.parse(text);
+            updateDayDetailsUI(data, selectedDates);
+        } catch (e) {
+            console.error('Error parsing JSON:', e);
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching day details:', error);
+    });
+}
+
+function updateDayDetailsUI(data, selectedDates) {
+    const detailsContainer = document.getElementById('selected-day-details');
+
+    if(!data || !data.details) {
+        detailsContainer.innerHTML = '<p>No details available</p>';
+        return;
+    }
+
+    //Clear previous content
+    detailsContainer.innerHTML = '';
+
+    //Create a new table to display details
+    const table = document.createElement('table');
+    const header = document.createElement('tr');
+
+    //Create and append table headers
+    const headers = ['Date','Start Time', 'End Time', 'Break (min)', 'Hourly Rate', 'Overtime Rate'];
+    headers.forEach(text => {
+        const th = document.createElement('th');
+        th.textContent = text;
+        header.appendChild(th);
+    });
+    table.appendChild(header);
+
+    //Append data rows
+    data.details.forEach(detail => {
+        const row = document.createElement('tr');
+
+        //Create a hidden input field to store the id
+        const hiddenIdInput = document.createElement('input');
+        hiddenIdInput.type = 'hidden';
+        hiddenIdInput.value = detail.id;
+        row.appendChild(hiddenIdInput);
+
+        //Create table cells for each value and allow inline editing
+        const editableFields = ['work_date', 'start_time', 'end_time', 'break_minutes', 'hourly_rate', 'overtime_rate'];
+        editableFields.forEach(field => {
+            const td = document.createElement("td");
+            const input = document.createElement("input");
+            input.type = "text";
+            input.value = detail[field];
+            input.disabled = true; 
+            td.appendChild(input);
+            row.appendChild(td);
+        });
+
+        //Create a cell for action buttons
+        const actionCell = document.createElement('td');
+
+        //Create Edit button
+        const editButton = document.createElement('button');
+        editButton.textContent = 'Edit';
+        editButton.addEventListener('click', () => {
+            row.querySelectorAll('input').forEach(input => input.disabled = false);
+            editButton.style.display = 'none';
+            
+            //Create submit button
+            const submitButton = document.createElement('button');
+            submitButton.textContent = 'Submit';
+            submitButton.addEventListener('click', () => {
+                saveEditRow(detail.id, row, submitButton, editButton);
+            });
+            actionCell.appendChild(submitButton);
+        });
+        actionCell.appendChild(editButton);
+
+        //Create Delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => {
+            deleteWorkEntry(detail.id, selectedDates);
+        });
+        actionCell.appendChild(deleteButton);
+
+        row.appendChild(actionCell);
+
+        table.appendChild(row);
+    });
+
+    //Append the table to the container
+    detailsContainer.appendChild(table);
+}
+
+function saveEditRow(dayId, row, submitButton, editButton) {
+    const editedData = {};
+    const inputs = row.querySelectorAll('input');
+
+    inputs.forEach((input, index) => {
+        const field = ['work_date', 'start_time', 'end_time', 'break_minutes', 'hourly_rate', 'overtime_rate'][index];
+        editedData[field] = input.value;
+    });
+
+    //Send the edited data to the backend
+    fetch('/MoneyTracker/includes/handle_day_action.inc.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            action: 'edit',
+            dayId: dayId,
+            editedData: editedData
+        }),
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status === 'success') {
+            alert ('Row updated successfully!');
+            inputs.forEach(input => input.disabled = true); //disables inputs
+            submitButton.remove();  //removes submit button
+            editButton.style.display = 'inline'; //shows edit button
+        } else {
+            alert('Failed to update row');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 }
