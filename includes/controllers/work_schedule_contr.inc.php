@@ -1,5 +1,4 @@
 <?php
-
 require_once __DIR__ . '/../models/work_schedule_model.inc.php';
 
 class WorkScheduleController{
@@ -94,22 +93,13 @@ class WorkScheduleController{
                     $overtime_rate
                 );
             }
-
-            //Handle taxes
-            $tax_rate = 0.15;
-            $taxes = $total_wage * $tax_rate;
-            $net_wage = $total_wage - $taxes;
-
-            echo "<h3>Wage Calculation Results</h3>";
-            echo "<p>Total Wage: $" . number_format($total_wage, 2) . "</p>";
-            echo "<p>Taxes: $" . number_format($taxes, 2) . "</p>";
-            echo "<p>Net Wage: $" . number_format($net_wage, 2) . "</p>";
         }
     }
 
     //Fetch details for the selected days
-    public function getDetailsForSelectedDays($selectedDates) {
-        return $this->workScheduleModel->getDetailsForSelectedDays($selectedDates);
+    public function getDetailsForSelectedDays($selectedDates, $user_id) {
+        error_log("Fetching details for selected dates " . json_encode($selectedDates));
+        return $this->workScheduleModel->getDetailsForSelectedDays($selectedDates, $user_id);
     }
 
     //Update work entry for specific day

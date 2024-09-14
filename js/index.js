@@ -186,7 +186,7 @@ function handleWorkCalendar() {
             });
         });
     }
-
+    
     attachDayClickListeners();
 
 
@@ -207,7 +207,7 @@ function handleWorkCalendar() {
         .then(data => {
             console.log('Response data:', data);
             if (data.totalWage != undefined) {
-                alert('Total Wage: ' + data.totalWage);
+                alert('Net Wage: ' + data.netWage);
             } else {
                 alert('Error calculating wage: ' + (data.error || 'Unknown error'));
             }
@@ -224,7 +224,11 @@ function handleWorkCalendar() {
     //On button click, display the details for the selected dates
     document.getElementById('display-details-btn').addEventListener('click', function() {
         console.log(selectedDates);
-        fetchDayDetails(selectedDates);
+        if (!selectedDates || selectedDates.length === 0) {
+            clearDayDetails();
+        } else {
+            fetchDayDetails(selectedDates);
+        }
     });
 
     //Add event listeners to previous and next buttons
@@ -237,7 +241,34 @@ function handleWorkCalendar() {
             loadContent('work-calendar', year, month);
         });
     });
+
+    highlightCurrentDay();
 }
+
+function clearDayDetails() {
+    const detailsContainer = document.getElementById('selected-day-details');
+    detailsContainer.innerHTML = '<p>No dates selected. </p>';
+}
+
+function highlightCurrentDay() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+
+    //Format the current date as YYYY-MM-DD
+    const currentDateString = `${year} - ${month.toString().padStart(2, '0')} - ${day.toString().padStart(2, '0')}`;
+
+    const calendarDays = document.querySelectorAll('.calendar-day');
+
+    calendarDays.forEach(dayElement => {
+        if (dayElement.getAttribute('data-date') === currentDateString) {
+            dayElement.classList.add('highlight-today');
+        }
+    });
+}
+
+
 
 function showWorkInfo(event) {
     const modal = document.getElementById('work-info-modal');

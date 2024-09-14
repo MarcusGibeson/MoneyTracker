@@ -1,12 +1,14 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 require_once 'configurations/dbh.inc.php';
 require_once 'controllers/work_schedule_contr.inc.php'; 
 
+session_start(); 
 $controller = new WorkScheduleController($pdo);
 
 header('Content-Type: application/json');
-
 
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
     //Get raw POST body and decode the JSON
@@ -14,14 +16,14 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //Handle fetching day details
     if (isset($input['selectedDates'])) {
+        $user_id = $_SESSION['user_id'];
         $selectedDates = $input['selectedDates'];
-        $dayDetails = $controller->getDetailsForSelectedDays($selectedDates);
+        $dayDetails = $controller->getDetailsForSelectedDays($selectedDates, $user_id);
         if($dayDetails) {
             echo json_encode(['details' => $dayDetails]);
         }else {
             echo json_encode([]);
         }
-        
         exit;
     }
 

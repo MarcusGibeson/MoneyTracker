@@ -130,18 +130,21 @@ class WorkSchedule{
         return true;
     }
 
-    public function getDetailsForSelectedDays($selectedDates) {
+    public function getDetailsForSelectedDays($selectedDates, $user_id) {
         //Create placeholders for the query
         $placeholders = implode(',', array_fill(0, count($selectedDates), '?'));
 
         $sql = "
             SELECT id, work_date, start_time, end_time, break_minutes, hourly_rate, overtime_rate
             FROM work_schedule
-            WHERE work_date IN ($placeholders)
+            WHERE work_date IN ($placeholders) AND user_id = ?
         ";
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($selectedDates);
+
+        //Add user_id as the last parameter in the array
+        $params = array_merge($selectedDates, [$user_id]);
+        $stmt->execute($params);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

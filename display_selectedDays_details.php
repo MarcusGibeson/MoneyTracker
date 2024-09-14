@@ -11,7 +11,7 @@ $selectedDates = $_POST['dates'] ?? [];
 
 
 //Get details from selected dates
-$details = $workScheduleContr->getDetailsForSelectedDays($selectedDates);
+$details = $workScheduleContr->getDetailsForSelectedDays($selectedDates, $user_id);
 
 
 
